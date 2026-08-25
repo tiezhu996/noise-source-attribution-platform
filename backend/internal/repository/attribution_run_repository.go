@@ -42,9 +42,6 @@ func (r *AttributionRunRepository) FindByInput(ctx context.Context, hash, versio
 
 func (r *AttributionRunRepository) CreateCalculated(ctx context.Context, run *model.AttributionRun, audit *model.AuditLog) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		defer func() {
-			_ = tx.Rollback()
-		}()
 		finalState := run.AttributionState
 		finishedAt := run.FinishedAt
 		run.AttributionState = "queued"
@@ -80,9 +77,6 @@ func (r *AttributionRunRepository) CreateCalculated(ctx context.Context, run *mo
 
 func (r *AttributionRunRepository) Transition(ctx context.Context, id, expectedVersion uint, from, to string, reviewedBy *uint, reviewNote string, audit *model.AuditLog) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		defer func() {
-			_ = tx.Rollback()
-		}()
 		updates := map[string]any{
 			"attribution_state": to, "version": gorm.Expr("version + 1"), "updated_at": time.Now().UTC(),
 		}

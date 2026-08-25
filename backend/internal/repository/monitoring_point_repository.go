@@ -57,9 +57,6 @@ func (r *MonitoringPointRepository) Summary(ctx context.Context, id uint) (Point
 
 func (r *MonitoringPointRepository) Create(ctx context.Context, point *model.MonitoringPoint, audit *model.AuditLog) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		defer func() {
-			_ = tx.Rollback()
-		}()
 		if err := tx.Create(point).Error; err != nil {
 			return fmt.Errorf("create monitoring point: %w", err)
 		}
@@ -95,9 +92,6 @@ func (r *MonitoringPointRepository) Update(ctx context.Context, point *model.Mon
 
 func (r *MonitoringPointRepository) Deactivate(ctx context.Context, id, expectedVersion uint, audit *model.AuditLog) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		defer func() {
-			_ = tx.Rollback()
-		}()
 		result := tx.Model(&model.MonitoringPoint{}).
 			Where("id = ? AND version = ? AND point_state = ?", id, expectedVersion, "active").
 			Updates(map[string]any{"point_state": "inactive", "version": gorm.Expr("version + 1"), "updated_at": time.Now().UTC()})

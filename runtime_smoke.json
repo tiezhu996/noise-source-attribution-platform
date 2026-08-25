@@ -1,0 +1,17 @@
+{
+  "mode": "service",
+  "start": "go run ./cmd/server",
+  "workdir": "backend",
+  "env": {
+    "PORT": "20538",
+    "DB_DRIVER": "sqlite",
+    "DB_DSN": "file:runtime-smoke?mode=memory&cache=shared",
+    "JWT_SECRET": "runtime-smoke-only-change-me"
+  },
+  "ready_url": "http://127.0.0.1:20538/healthz",
+  "ready_status": [
+    200
+  ],
+  "startup_timeout": 30,
+  "project_intro": "基于 Go 实现的噪声源贡献归因平台 Web 项目，一款后端服务，完成监测点与背景谱维护、倍频程测量导入、声源谱版本管理与非负最小二乘贡献归因。"
+}

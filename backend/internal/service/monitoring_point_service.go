@@ -26,7 +26,7 @@ func (s *MonitoringPointService) List(ctx context.Context) ([]dto.MonitoringPoin
 	if err != nil {
 		return nil, err
 	}
-	result := make([]dto.MonitoringPointResponse, len(points))
+	result := make([]dto.MonitoringPointResponse, 0, len(points))
 	for _, point := range points {
 		response, err := s.toResponse(ctx, point)
 		if err != nil {

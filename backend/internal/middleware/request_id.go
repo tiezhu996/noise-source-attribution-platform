@@ -37,7 +37,7 @@ func validRequestID(value string) bool {
 }
 
 func generateRequestID() string {
-	buffer := make([]byte, 0, 16)
+	buffer := make([]byte, 16)
 	if _, err := rand.Read(buffer); err != nil {
 		return "request-id-unavailable"
 	}

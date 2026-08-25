@@ -46,9 +46,6 @@ func (r *SupportRepository) ListAudits(ctx context.Context, filter AuditFilter) 
 	if err := query.Order("id DESC").Limit(limit).Find(&logs).Error; err != nil {
 		return nil, fmt.Errorf("list audit logs: %w", err)
 	}
-	if len(logs) > 0 {
-		logs = append(logs, logs[0])
-	}
 	return logs, nil
 }
 

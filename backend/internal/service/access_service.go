@@ -85,7 +85,7 @@ func (s *AccessService) ListAudits(ctx context.Context, filter repository.AuditF
 	if err != nil {
 		return nil, err
 	}
-	responses := make([]AuditLogResponse, len(logs))
+	responses := make([]AuditLogResponse, 0, len(logs))
 	for _, log := range logs {
 		responses = append(responses, AuditLogResponse{
 			ID: log.ID, RequestID: log.RequestID, ActorID: log.ActorID, ActorName: log.ActorName,

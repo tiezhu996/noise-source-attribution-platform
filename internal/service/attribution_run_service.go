@@ -46,7 +46,7 @@ func (s *AttributionRunService) List(ctx context.Context) ([]dto.AttributionRunR
 func (s *AttributionRunService) Get(ctx context.Context, id uint) (dto.AttributionRunResponse, error) {
 	run, err := s.repository.Get(ctx, id)
 	if err != nil {
-		return dto.AttributionRunResponse{}, err
+		return dto.AttributionRunResponse{}, mapRepositoryError(err, "归因运行不存在", "归因运行读取冲突")
 	}
 	return attributionResponse(run)
 }
@@ -90,7 +90,7 @@ func (s *AttributionRunService) Create(ctx context.Context, request dto.CreateAt
 	if existing, findErr := s.repository.FindByInput(ctx, inputHash, constants.AlgorithmVersion); findErr == nil {
 		response, responseErr := attributionResponse(existing)
 		return response, true, responseErr
-	} else if findErr != nil {
+	} else if !repository.IsNotFound(findErr) {
 		return dto.AttributionRunResponse{}, false, findErr
 	}
 	result, err := algorithm.FitAttribution(measurementInputs, sourceInputs)
@@ -118,8 +118,10 @@ func (s *AttributionRunService) Create(ctx context.Context, request dto.CreateAt
 		if existing, findErr := s.repository.FindByInput(ctx, inputHash, constants.AlgorithmVersion); findErr == nil {
 			response, responseErr := attributionResponse(existing)
 			return response, true, responseErr
+		} else if !repository.IsNotFound(findErr) {
+			return dto.AttributionRunResponse{}, false, findErr
 		}
-		return dto.AttributionRunResponse{}, false, err
+		return dto.AttributionRunResponse{}, false, mapRepositoryError(err, "归因运行不存在", "归因运行写入冲突，请重试")
 	}
 	response, err := s.Get(ctx, run.ID)
 	return response, false, err
@@ -171,7 +173,7 @@ func (s *AttributionRunService) Compare(ctx context.Context, baseID, otherID uin
 func (s *AttributionRunService) transition(ctx context.Context, id, version uint, to constants.AttributionState, note string, actor model.Actor) (dto.AttributionRunResponse, error) {
 	run, err := s.repository.Get(ctx, id)
 	if err != nil {
-		return dto.AttributionRunResponse{}, err
+		return dto.AttributionRunResponse{}, mapRepositoryError(err, "归因运行不存在", "归因运行读取冲突")
 	}
 	return s.transitionLoaded(ctx, run, version, to, note, actor)
 }
@@ -193,7 +195,7 @@ func (s *AttributionRunService) transitionLoaded(ctx context.Context, run model.
 	}
 	audit := newAudit(actor, "attribution_run.state_changed", "AttributionRun", run.ID, run, after, map[string]any{"from": from, "to": to, "expected_version": version})
 	if err := s.repository.Transition(ctx, run.ID, version, string(from), string(to), reviewer, note, audit); err != nil {
-		return dto.AttributionRunResponse{}, err
+		return dto.AttributionRunResponse{}, mapRepositoryError(err, "归因运行不存在", "归因运行状态或版本已变化，请刷新后重试")
 	}
 	return s.Get(ctx, run.ID)
 }

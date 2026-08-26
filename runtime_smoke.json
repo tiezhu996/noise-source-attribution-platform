@@ -1,7 +1,7 @@
 {
   "mode": "service",
   "start": "go run ./cmd/server",
-  "workdir": ".",
+  "workdir": "",
   "env": {
     "PORT": "20538",
     "DB_DRIVER": "sqlite",

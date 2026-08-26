@@ -54,7 +54,7 @@ func Respond(c *gin.Context, status int, data any) {
 
 func RespondError(c *gin.Context, err error) {
 	var appErr *AppError
-	if errors.Is(err, appErr) {
+	if errors.As(err, &appErr) {
 		c.JSON(appErr.Status, gin.H{
 			"code": appErr.Code, "message": appErr.Message,
 			"request_id": c.GetString("request_id"),

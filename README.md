@@ -60,10 +60,9 @@ NoiseTrace 面向职业卫生工程师、厂区声学分析员和独立复核人
 Browser -> Nginx :80 -> Vue 3 SPA
                     -> /api/v1 -> Gin :8080 -> GORM -> PostgreSQL 16
 
-backend/
-  cmd/server
-  internal/config constants dto model repository service handler router
-  internal/middleware algorithm util
+cmd/server
+internal/config constants dto model repository service handler router
+internal/middleware algorithm util
 frontend/src/
   api stores types components/common hooks pages router utils
 database/
@@ -152,14 +151,14 @@ queued -> calculating -> completed -> reviewed -> confirmed
 
 `MeasurementQuality = valid | contaminated | clipped | missing`
 
-- 后端定义：`backend/internal/constants/measurement_quality.go`。
+- 后端定义：`internal/constants/measurement_quality.go`。
 - 后端消费：NoiseMeasurement model/DTO、测量 service 质量判定、handler/router 响应链和算法/状态测试。
 - 前端定义：`frontend/src/types/enums/measurement-quality.ts`。
 - 前端消费：measurement type/store、`QualityBadge`、监测点/测量/归因页面和枚举测试。
 
 `AttributionState = queued | calculating | completed | failed | reviewed | confirmed | voided`
 
-- 后端定义：`backend/internal/constants/attribution_state.go`。
+- 后端定义：`internal/constants/attribution_state.go`。
 - 后端消费：AttributionRun model/DTO、service 状态机、repository 条件更新、handler/router 和状态测试。
 - 前端定义：`frontend/src/types/enums/attribution-state.ts`。
 - 前端消费：attribution type/store、`StateBadge`、归因页面、`AttributionDetailDrawer` 和枚举测试。
@@ -216,18 +215,12 @@ Vite 把 `/api` 代理到 `http://127.0.0.1:19538`。前端始终使用相对 `/
 ## 构建与测试
 
 ```bash
-go work sync
 go build ./...
 go vet ./...
 go test ./...
 go test -race ./...
 
-go build ./...
-go vet ./...
-go test ./...
-go test -race ./...
-
-cd ../frontend
+cd frontend
 npm ci
 npm test
 npm run typecheck

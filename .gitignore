@@ -10,6 +10,6 @@ coverage/
 *.db
 *.db-shm
 *.db-wal
-backend/bin/
+bin/
 .idea/
 .vscode/
